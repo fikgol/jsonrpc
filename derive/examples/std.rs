@@ -1,12 +1,13 @@
 //! A simple example
-#![deny(missing_docs)]
+
+//#![deny(missing_docs)]
 use jsonrpc_core::futures::future::{self, Future, FutureResult};
 use jsonrpc_core::{Error, IoHandler, Result};
 use jsonrpc_core_client::transports::local;
 use jsonrpc_derive::rpc;
 
 /// Rpc trait
-#[rpc]
+#[rpc(client, server, schema)]
 pub trait Rpc {
 	/// Returns a protocol version.
 	#[rpc(name = "protocolVersion")]
@@ -48,9 +49,11 @@ impl Rpc for RpcImpl {
 fn main() {
 	let mut io = IoHandler::new();
 	io.extend_with(RpcImpl.to_delegate());
-
 	let fut = {
 		let (client, server) = local::connect::<gen_client::Client, _, _>(io);
+		let schema = rpc_impl_Rpc::gen_client::Client::gen_schema();
+		let j = serde_json::to_string_pretty(&schema).unwrap();
+		println!("{}", j);
 		client.add(5, 6).map(|res| println!("5 + 6 = {}", res)).join(server)
 	};
 	fut.wait().unwrap();
