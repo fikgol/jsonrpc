@@ -1,5 +1,5 @@
 //! A simple example
-#![deny(missing_docs)]
+//#![deny(missing_docs)]
 use jsonrpc_core::futures::{self, future, TryFutureExt};
 use jsonrpc_core::{BoxFuture, IoHandler, Result};
 use jsonrpc_core_client::transports::local;
@@ -51,7 +51,9 @@ fn main() {
 
 	let (client, server) = local::connect::<RpcClient, _, _>(io);
 	let fut = client.add(5, 6).map_ok(|res| println!("5 + 6 = {}", res));
-
+	let schema = rpc_impl_Rpc::gen_client::Client::gen_schema();
+	let j = serde_json::to_string_pretty(&schema).unwrap();
+	println!("{}", j);
 	futures::executor::block_on(async move { futures::join!(fut, server) })
 		.0
 		.unwrap();

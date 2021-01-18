@@ -274,6 +274,9 @@ pub fn rpc_impl(input: syn::Item, options: &DeriveOptions) -> Result<proc_macro2
 			pub use self::#mod_name_ident::gen_server::#name;
 		});
 	}
+	if options.enable_schema {
+		//TODO
+	}
 	Ok(quote!(
 		mod #mod_name_ident {
 			use #core_name as _jsonrpc_core;
